@@ -48,7 +48,7 @@ class PinboardApi
     if (!$this->curl)
     {
       $this->curl = new Curl;
-      $this->curl->user_agent = 'PinboardApi (url here)';
+      $this->curl->user_agent = 'PinboardApi (https://github.com/lyoshenka/pinboardApi)';
     }
     return $this->curl;
   }
