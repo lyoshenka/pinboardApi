@@ -1,10 +1,30 @@
 <?php
 
-require_once 'curl/curl.php';
+require_once 'curl/curl.php'; #https://github.com/shuber/curl
 
+/**
+ *
+ * PinboardApi
+ *
+ * A PHP wrapper around the Pinboard api
+ *
+ * @method mixed postsUpdate
+ * @method mixed postsAdd
+ * @method mixed postsDelete
+ * @method mixed postsGet
+ * @method mixed postsDates
+ * @method mixed postsRecent
+ * @method mixed postsAll
+ * @method mixed postsSuggest
+ * @method mixed tagsGet
+ * @method mixed tagsDelete
+ * @method mixed tagsRename
+ * @method mixed userSecret
+ *
+ */
 class PinboardApi
 {
-  protected $username, $password;
+  protected $username, $password, $curl;
   protected $methods = array(
     'postsUpdate', 
     'postsAdd', 'postsDelete', 'postsGet', 'postsDates', 'postsRecent', 'postsAll', 'postsSuggest', 
@@ -21,6 +41,16 @@ class PinboardApi
   protected function getUrl($method)
   {
     return 'https://' . $this->username . ':' . $this->password . '@api.pinboard.in/v1/' . $method;
+  }
+
+  protected function getCurl()
+  {
+    if (!$this->curl)
+    {
+      $this->curl = new Curl;
+      $this->curl->user_agent = 'PinboardApi (url here)';
+    }
+    return $this->curl;
   }
 
   public function __call($name, $arguments)
@@ -46,7 +76,7 @@ class PinboardApi
     }
 
     $url = $this->getUrl($method);
-    $curl = new Curl;
+    $curl = $this->getCurl();
     $response = $curl->get($url, $args);
 
     return $raw ? $response->body : $this->parseResponse($response, $format);
@@ -65,7 +95,7 @@ class PinboardApi
         return simplexml_load_string($response->body);
 
       case 'json':
-        return json_decode($response->body);
+        return json_decode($response->body, true);
 
       default:
         throw new InvalidArgumentException('Unsupported format: ' . $format);
