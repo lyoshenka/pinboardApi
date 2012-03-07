@@ -1,0 +1,6 @@
+- rate limiting for 429 response codes
+- oauth (when pinboard supports it)
+- better error handling
+- better docs for how to use
+- stop using curl wrapper (maybe)
+- remove test stuff from git
