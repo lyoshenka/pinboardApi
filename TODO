@@ -4,3 +4,4 @@
 - better docs for how to use
 - stop using curl wrapper (maybe)
 - remove test stuff from git
+- validate params passed for each method, or at least that the param is supported by that method

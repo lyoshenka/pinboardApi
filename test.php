@@ -7,6 +7,11 @@ require_once 'auth.php'; // defines $username and $password
 
 $api = new PinboardApi($username, $password);
 
-//$api->api('posts/get', array());
-//var_export($api->postsRecent());
-var_export($api->postsGet(array('format'=>'json')));
+var_export($api->postsAdd(array(
+  'url' => 'https://github.com/lyoshenka/pinboardApi',
+  'description' => 'PinboardApi',
+  'tags' => 'github pinboard coolbeans',
+  'dt' => date('c', strtotime('03/06/2012'))
+)));
+
+//var_export($api->postsGet(array()));

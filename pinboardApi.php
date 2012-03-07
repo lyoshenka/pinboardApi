@@ -43,14 +43,29 @@ class PinboardApi
     return 'https://' . $this->username . ':' . $this->password . '@api.pinboard.in/v1/' . $method;
   }
 
-  protected function getCurl()
+  protected function doCurl($url, $args)
   {
-    if (!$this->curl)
+    $url = $url . '?' . http_build_query($args);
+    echo $url . "\n";
+    $ch = curl_init();
+    curl_setopt_array($ch, array(
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_USERAGENT => 'PinboardApi (https://github.com/lyoshenka/pinboardApi)',
+      CURLOPT_URL => $url
+    ));
+
+    $response = array(
+      'body' => curl_exec($ch), 
+      'info' => curl_getinfo($ch),
+    );
+
+    if (curl_errno($ch))
     {
-      $this->curl = new Curl;
-      $this->curl->user_agent = 'PinboardApi (https://github.com/lyoshenka/pinboardApi)';
+      throw new RuntimeException('Curl error: ' . $curl_error($ch));
     }
-    return $this->curl;
+
+    curl_close($ch);
+    return $response;
   }
 
   public function __call($name, $arguments)
@@ -62,7 +77,7 @@ class PinboardApi
       return call_user_func_array(array($this, 'api'), $arguments);
     }
 
-    throw new Exception('Unsupported method: ') . $name;
+    throw new Exception('Unsupported method: ' . $name);
   }
 
   protected function api($method, $args = array())
@@ -76,26 +91,25 @@ class PinboardApi
     }
 
     $url = $this->getUrl($method);
-    $curl = $this->getCurl();
-    $response = $curl->get($url, $args);
+    $response = $this->doCurl($url, $args);
 
-    return $raw ? $response->body : $this->parseResponse($response, $format);
+    return $raw ? $response['body'] : $this->parseResponse($response, $format);
   }
 
   protected function parseResponse($response, $format)
   {
-    if ($response->headers['Status-Code'] != 200)
+    if ($response['info']['http_code'] != 200)
     {
-      return $response->body;
+      return $response['body'];
     }
 
     switch ($format)
     {
       case 'xml':
-        return simplexml_load_string($response->body);
+        return simplexml_load_string($response['body']);
 
       case 'json':
-        return json_decode($response->body, true);
+        return json_decode($response['body'], true);
 
       default:
         throw new InvalidArgumentException('Unsupported format: ' . $format);
