@@ -7,4 +7,5 @@ require_once 'auth.php'; // defines $username and $password
 
 $api = new PinboardApi($username, $password);
 
-$api->api('posts/get', array());
+//$api->api('posts/get', array());
+var_export($api->postsRecent());
