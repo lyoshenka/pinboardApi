@@ -44,7 +44,6 @@ class PinboardApi
   protected function doCurl($url, $args)
   {
     $url = $url . '?' . http_build_query($args);
-    echo $url . "\n";
     $ch = curl_init();
     curl_setopt_array($ch, array(
       CURLOPT_RETURNTRANSFER => true,
